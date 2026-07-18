@@ -1,37 +1,24 @@
-# Fuzzy Logic Control of an Inverted Pendulum
+# Inverted Pendulum Fuzzy Logic Control
 
-This repository contains the MATLAB/Simulink implementation of a Mamdani-type Fuzzy Logic Controller (FLC) designed to stabilize an inverted pendulum on a cart. This project was developed as part of the "Computer Application in Control" coursework at Shiraz University.
+This repository contains a MATLAB and Simulink implementation of an inverted pendulum stabilization system controlled by fuzzy logic. 
 
-## 📌 Project Overview
-The inverted pendulum is a classic, highly non-linear, and unstable control problem. The objective of this project is to maintain the pendulum in its upright position (unstable equilibrium) by applying a horizontal control force to the cart. 
+## Project Overview
+The system models the physical dynamics of an inverted pendulum mounted on a cart and uses a rule-based fuzzy controller to maintain its upright position. 
 
-Instead of using traditional linear control methods (like LQR or PID), this system utilizes a rule-based **Fuzzy Logic Controller** to handle the non-linear dynamics.
+### 1. Plant Dynamics & Physical Model
+The physical environment and non-linear dynamics of the pendulum are defined using a MATLAB initialization script and simulated in Simulink. 
+*   **System Parameters:** The model operates with an acceleration due to gravity of 9.81 m/s², a pendulum mass of 0.1 kg, a cart mass of 1.0 kg, and a pendulum length of 0.5 m.
+*   **Simulink Plant:** These parameters are evaluated inside a mathematical function block (`Fcn`) within the Simulink model to calculate the continuous motion and behavior of the system.
+*   **Simulation Test:** To physically prove the controller's stabilizing capabilities, the integrators are initialized with the pendulum leaning slightly off-balance at an initial angle (`x1_0`) of 0.1 radians, with an initial angular velocity (`x2_0`) of 0.0 rad/s.
 
-## ⚙️ System Architecture
+### 2. Fuzzy Logic Controller
+The control strategy relies on a Mamdani-type Fuzzy Inference System rather than standard linear control methodologies. 
+*   **Inputs:** The controller evaluates the pendulum's current angle (`Theta`, with a range of -1.6 to 1.6) and its angular velocity (`Thatadot`, with a range of -5 to 5). 
+*   **Output:** It computes the necessary horizontal corrective `Force` (ranging from -40 to 40) to apply to the system.
+*   **Logic Structure:** The controller utilizes 5 triangular membership functions (`trimf`) for each variable: NB, NS, ZO, PS, and PB.
+*   **Rule Base:** The core control behavior is driven by a matrix of exactly 25 IF-THEN rules to determine the appropriate stabilization force under varying conditions.
 
-### 1. Plant Dynamics (Simulink)
-The non-linear differential equations governing the pendulum's motion are modeled directly inside Simulink using a custom function block. The model computes the angular acceleration based on the applied force and current state variables (gravity, pendulum mass, cart mass, and length).
-
-### 2. Fuzzy Logic Controller (FIS)
-The controller was designed using MATLAB's Fuzzy Logic Toolbox with the following specifications:
-*   **Type:** Mamdani Inference System
-*   **Inputs (2):** 
-    *   `Theta` (Pendulum Angle) 
-    *   `Thatadot` (Angular Velocity)
-*   **Output (1):** 
-    *   `Force` (Control action applied to the cart)
-*   **Membership Functions:** 5 Triangular (`trimf`) functions per variable (NB, NS, ZO, PS, PB).
-*   **Rule Base:** 25 carefully tuned fuzzy IF-THEN rules evaluate the system state and determine the appropriate restorative force.
-
-## 📂 Repository Structure
-*   `init_pendulum.m`: MATLAB script that loads the physical constants (mass, length, gravity) and initial integrator states into the workspace.
-*   `inverted_pendulum.mdl`: The Simulink model containing the non-linear plant and the Fuzzy Controller block.
-*   `controller.fis`: The Fuzzy Inference System file containing the membership functions and the 25-rule control logic.
-
-## 🚀 How to Run the Simulation
-1. Clone this repository to your local machine.
-2. Open MATLAB and navigate to the repository directory.
-3. Run the initialization script by typing `init_pendulum` in the Command Window. This will load the required parameters into the workspace.
-4. Open the `inverted_pendulum.mdl` file in Simulink.
-5. Ensure the Fuzzy Logic Controller block is configured to read the `controller.fis` file.
-6. Run the simulation to observe the stabilization of the pendulum.
+## Repository Files
+*   `init_pendulum.m`: A MATLAB script that loads the physical constants (mass, length, gravity) and the initial off-balance starting conditions into the system workspace.
+*   `controller_2.fis`: The Fuzzy Inference System file containing the variable ranges, the triangular membership functions, and the 25-rule control logic.
+*   `inverted_pendulum_2.mdl`: The primary Simulink model file that contains the non-linear plant equations, integrators, and the Fuzzy Logic Controller.
